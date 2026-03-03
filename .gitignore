@@ -205,3 +205,28 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+################################
+# RNA-seq specific ignores
+################################
+
+# Raw data
+raw_data/
+
+# Snakemake output folders
+trimmed/
+aligned/
+counts/
+logs/
+.snakemake/
+
+# Large sequencing files
+*.fastq.gz
+*.fq.gz
+*.bam
+*.sam
+*.bai
+
+# STAR genome index (if generated locally)
+genome_index/
+
+################################
