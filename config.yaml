@@ -1,0 +1,13 @@
+samples:
+  - INP-A
+  - INP-B
+  - INP-C
+  - SRR12650977
+  - SRR12650978
+  - SRR12650979
+
+genome: "reference/genome/hg38.fa"
+annotation: "reference/annotation/gencode.v41.annotation.gtf"
+star_index: "reference/star_index/"
+
+threads: 4

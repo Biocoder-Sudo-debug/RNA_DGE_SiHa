@@ -205,19 +205,38 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
-################################
-# RNA-seq specific ignores
-################################
+###############################
+# RNA-seq pipeline ignores
+###############################
 
-# Raw data
+# Raw sequencing data
 raw_data/
 
-# Snakemake output folders
-trimmed/
-aligned/
-counts/
-logs/
+# Snakemake temporary files
 .snakemake/
+
+# additional files
+
+fastp.html
+fastp.json
+
+# Logs
+logs/
+
+# QC outputs
+results/fastqc/
+results/fastqc_trimmed/
+results/multiqc/
+results/multiqc_trimmed/
+
+# Trimmed reads
+results/trimmed/
+
+# Alignment outputs
+aligned/
+
+# Count files
+counts/
 
 # Large sequencing files
 *.fastq.gz
@@ -226,7 +245,13 @@ logs/
 *.sam
 *.bai
 
-# STAR genome index (if generated locally)
-genome_index/
+# STAR genome index
+reference/star_index/
 
-################################
+# Optional reference genomes
+reference/genome/*.fa
+reference/genome/*.fasta
+reference/genome/
+reference/annotation/
+
+###############################
