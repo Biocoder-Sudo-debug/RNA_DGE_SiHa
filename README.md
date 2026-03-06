@@ -1,198 +1,230 @@
-# RNA_DGE_SiHa
+# 🧬 RNA_DGE_SiHa
 
-Snakemake-based RNA-seq analysis workflow for Differential Gene Expression (DGE) analysis of **SiHa cervical cancer cell line samples**.
+Reproducible end-to-end RNA-Seq Differential Gene Expression (DGE) pipeline for the **SiHa cervical cancer cell line** using **Snakemake**.
 
-This pipeline performs quality control, adapter trimming, alignment, and prepares data for downstream differential expression analysis.
-
----
-
-# Project Overview
-
-RNA sequencing (RNA-seq) enables transcriptome-wide measurement of gene expression.
-This workflow automates the preprocessing and alignment stages of RNA-seq analysis using **Snakemake**, ensuring reproducibility and scalability.
-
-The current dataset contains:
-
-* **3 treated samples**
-* **3 control samples**
-* **paired-end sequencing reads (150 bp)**
+This project implements a modern RNA-seq workflow using alignment-free transcript quantification and gene-level statistical modeling, followed by functional enrichment analysis.
 
 ---
 
-# Workflow
+# 📌 Overview
 
-The pipeline performs the following steps:
+This pipeline performs:
+
+- ✅ Raw read quality control (FastQC)
+- ✅ Adapter trimming (fastp)
+- ✅ Transcript-level quantification (Salmon)
+- ✅ Gene-level aggregation (tximport)
+- ✅ Differential expression analysis (DESeq2)
+- ✅ GO enrichment analysis
+- ✅ KEGG pathway enrichment
+- ✅ Automated visualization outputs
+- ✅ Fully reproducible Conda environments
+
+The entire workflow is automated and reproducible using **Snakemake**.
+
+---
+
+# 🔬 Experimental Design
+
+| Condition | Samples |
+|-----------|----------|
+| Control   | INP-A, INP-B, INP-C |
+| Treated   | SRR12650977, SRR12650978, SRR12650979 |
+
+Design formula used in DESeq2:
+
+```r
+~ condition
+```
+
+---
+
+# ⚙️ Workflow Architecture
 
 ```
 Raw FASTQ
-   ↓
-FastQC (quality assessment)
-   ↓
-MultiQC (combined QC report)
-   ↓
-Adapter trimming (fastp)
-   ↓
-FastQC on trimmed reads
-   ↓
-MultiQC (trimmed reads)
-   ↓
-STAR alignment
-   ↓
-Sorted BAM files
+    ↓
+FastQC
+    ↓
+fastp (adapter trimming)
+    ↓
+Salmon (quasi-mapping quantification)
+    ↓
+tximport (gene-level counts)
+    ↓
+DESeq2 (Differential Expression)
+    ↓
+clusterProfiler (GO + KEGG enrichment)
 ```
 
----
+This workflow uses **Salmon quasi-mapping** instead of traditional genome alignment, providing:
 
-# Software Used
-
-The following tools are used in the workflow:
-
-* Snakemake – workflow management system
-* FastQC – sequencing quality control
-* MultiQC – aggregated QC reporting
-* fastp – adapter trimming and preprocessing
-* STAR – RNA-seq read alignment
+- Faster execution
+- Lower memory usage
+- Reduced storage requirements
+- Bias-aware transcript quantification
+- Length-scaled gene-level counts
 
 ---
 
-# Project Structure
+# 🛠 Software & Tools
+
+| Tool | Purpose |
+|------|---------|
+| FastQC | Raw read quality assessment |
+| fastp | Adapter trimming |
+| Salmon | Transcript quantification |
+| tximport | Gene-level count aggregation |
+| DESeq2 | Differential gene expression |
+| clusterProfiler | GO & KEGG enrichment |
+| Snakemake | Workflow management |
+| Conda | Environment reproducibility |
+
+---
+
+# 📂 Project Structure
 
 ```
 RNA_DGE_SiHa/
 │
-├── raw_data/                # Raw sequencing data
-├── results/
-│   ├── fastqc/              # FastQC reports (raw reads)
-│   ├── trimmed/             # Trimmed FASTQ files
-│   ├── multiqc/             # MultiQC report (raw reads)
-│   ├── fastqc_trimmed/      # FastQC reports after trimming
-│   └── multiqc_trimmed/     # MultiQC report (trimmed reads)
-│
-├── aligned/                 # STAR alignment output (BAM)
-├── logs/                    # Workflow logs
-│
+├── Snakefile
+├── config.yaml
+├── envs/
+├── scripts/
+├── raw_data/
+├── metadata/
 ├── reference/
-│   ├── genome/              # Reference genome
-│   ├── annotation/          # Gene annotation (GTF)
-│   └── star_index/          # STAR genome index
-│
-├── scripts/                 # Downstream analysis scripts
-├── Snakefile                # Snakemake workflow
-├── config.yaml              # Sample configuration
+├── results/
+├── logs/
 └── README.md
 ```
 
 ---
 
-# Input Data
+# 🚀 Installation
 
-The workflow expects **paired-end FASTQ files**.
+Clone the repository:
 
-Example format:
-
-```
-sample_R1.fastq.gz
-sample_R2.fastq.gz
+```bash
+git clone https://github.com/yourusername/RNA_DGE_SiHa.git
+cd RNA_DGE_SiHa
 ```
 
-Example dataset:
+Create a base environment with Snakemake:
 
-```
-INP-A_R1.fastq.gz
-INP-A_R2.fastq.gz
+```bash
+conda create -n snakemake_env -c conda-forge -c bioconda snakemake
+conda activate snakemake_env
 ```
 
 ---
 
-# Configuration
+# ▶️ Running the Pipeline
 
-Sample names are defined in **config.yaml**.
+Execute the full workflow:
 
-Example configuration:
+```bash
+snakemake --cores 4 --use-conda
+```
 
-```yaml
-samples:
-  - INP-A
-  - INP-B
-  - INP-C
-  - SRR12650977
-  - SRR12650978
-  - SRR12650979
+Force re-run a specific rule:
+
+```bash
+snakemake -R deseq2_analysis --cores 4 --use-conda
+```
+
+Generate a workflow DAG:
+
+```bash
+snakemake --dag | dot -Tsvg > workflow_dag.svg
 ```
 
 ---
 
-# Running the Pipeline
+# 📊 Output Files
 
-Activate the conda environment:
-
-```
-conda activate system_genomics
-```
-
-Test the workflow (dry run):
+## Differential Expression Results
 
 ```
-snakemake -n
+results/deseq2/
+├── DEG_results.tsv
+├── significant_DEGs.tsv
+├── normalized_counts.tsv
+├── PCA_plot.png
+├── volcano_plot.png
+├── MA_plot.png
+└── heatmap_top50_genes.png
 ```
 
-Run the pipeline:
+## Functional Enrichment Results
 
 ```
-snakemake --cores 4
+results/enrichment/
+├── GO_BP_results.tsv
+├── KEGG_results.tsv
+├── GO_dotplot.png
+└── KEGG_dotplot.png
 ```
 
 ---
 
-# Output
+# 📈 Statistical Framework
 
-The pipeline generates:
+## Differential Expression
 
-### Quality Control Reports
+- Model: Negative binomial generalized linear model
+- Implemented in: DESeq2
+- Significance threshold:
+  - Adjusted p-value < 0.05
+  - |log2FoldChange| > 1
+- Multiple testing correction: Benjamini–Hochberg (FDR)
 
-```
-results/multiqc/multiqc_report.html
-results/multiqc_trimmed/multiqc_report.html
-```
+## Enrichment Analysis
 
-### Alignment Output
-
-```
-aligned/sample.bam
-```
-
-These BAM files are ready for downstream gene quantification and differential expression analysis.
-
----
-
-# Future Steps
-
-Planned additions to the pipeline include:
-
-* Gene quantification using featureCounts
-* Differential expression analysis using DESeq2
-* Data visualization (heatmaps, PCA, volcano plots)
+- Gene Ontology (Biological Process)
+- KEGG pathway enrichment
+- ID conversion: ENSEMBL → ENTREZ
+- Implemented using clusterProfiler
 
 ---
 
-# Reproducibility
+# 🔁 Reproducibility
 
-This workflow is managed using **Snakemake**, allowing:
+This workflow ensures:
 
-* automated execution of analysis steps
-* reproducible computational pipelines
-* easy scaling to larger datasets
+- Isolated Conda environments per rule
+- Fully version-controlled pipeline
+- Deterministic execution via Snakemake
+- Reproducible statistical results
+- Cross-platform portability
 
 ---
 
-# Author
+# 🎯 Why This Pipeline Is Modern
 
-Rajat Gupta
-Student Researcher – Life Sciences
+✔ Alignment-free transcript quantification  
+✔ Length-scaled gene counts via tximport  
+✔ Bias-aware abundance estimation  
+✔ Automated statistical modeling  
+✔ Integrated pathway interpretation  
+✔ Publication-ready outputs  
+✔ Fully reproducible workflow management  
 
-Research interests:
+---
 
-* Cancer Biology
-* Bioinformatics
-* Computational Genomics
+# 📚 Key References
+
+- Love MI, Huber W, Anders S. (2014). Moderated estimation of fold change and dispersion for RNA-seq data with DESeq2.
+- Patro R et al. (2017). Salmon provides fast and bias-aware quantification of transcript expression.
+- Yu G et al. (2021). clusterProfiler 4.0: A universal enrichment tool for interpreting omics data.
+
+---
+
+# 👨‍🔬 Author
+
+Rajat Gupta  
+Life Science Researcher  
+Focus: Cancer Biology & Bioinformatics  
+
+---
 
