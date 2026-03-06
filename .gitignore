@@ -255,3 +255,23 @@ reference/genome/
 reference/annotation/
 
 ###############################
+# R session files
+.RData
+.Rhistory
+
+# Snakemake
+.snakemake/
+
+# Results and logs
+results/
+logs/
+
+# Large reference files
+reference/transcriptome/
+reference/salmon_index/
+
+# Conda cache
+conda-meta/
+
+# OS files
+.DS_Store
